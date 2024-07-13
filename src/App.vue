@@ -1,8 +1,8 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import Button from 'primevue/button'
 import { ref } from 'vue';
 import Toast from 'primevue/toast';
+import ConfirmPopup from 'primevue/confirmpopup'
 const isDark = ref(false);
 const element = document.querySelector('html');
 function toggleColorScheme() {
@@ -13,6 +13,7 @@ function toggleColorScheme() {
 
 <template>
   <Toast />
+  <ConfirmPopup />
   <!-- <Button :icon=" isDark ? 'pi pi-moon' : 'pi pi-sun'" aria-label="Toogle Dark Mode" @click="toggleColorScheme()" /> -->
   <RouterView />
 </template>

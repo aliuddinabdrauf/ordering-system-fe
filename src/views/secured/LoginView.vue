@@ -28,6 +28,12 @@ import { reactive } from 'vue'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { useAxiosStore } from "@/stores/axios";
+import { useToast } from 'primevue/usetoast';
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
+const toast = useToast();
+const router = useRouter();
 
 const loginForm = reactive(useForm({
   validationSchema: yup.object({
@@ -39,15 +45,16 @@ const loginForm = reactive(useForm({
 const axiosStore = useAxiosStore();
 const [email, emailProps] = loginForm.defineField('email');
 const [passowrd, passwordProps] = loginForm.defineField('password');
-
+const user = useUserStore();
 function onSubmit() {
   loginForm.validate().then((result) => {
     if (result.valid) {
       const loader = axiosStore.loading.show();
       axiosStore.post('/api/authenticate/login', loginForm.values).then((response) => {
-        console.log(response);
+        user.authToken = response.data.token;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Login Success', life: 3000 });
+        router.push({ name: 'secured-home' });
       }).catch((error) => {
-        console.error(error);
       })
         .finally(() => {
           loader.hide();

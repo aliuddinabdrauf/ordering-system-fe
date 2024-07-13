@@ -1,19 +1,14 @@
 <template>
     <div>
-        
+        this is home view
     </div>
 </template>
 
-<script>
-export default {
-    setup () {
-        
+<script setup>
+import { useBreadcrumbStore } from '@/stores/breadcrumb';
 
-        return {}
-    }
-}
+const breadcrumbStore = useBreadcrumbStore();
+breadcrumbStore.breadCrumbItem = []
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
