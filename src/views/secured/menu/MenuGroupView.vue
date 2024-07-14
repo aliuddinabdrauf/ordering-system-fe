@@ -33,7 +33,7 @@
         :style="{ width: '25rem' }">
         <form novalidate @submit.prevent="saveMenuGroup" style="width:100%">
             <div class="flex items-center gap-4 mb-4">
-                <label for="username" class="font-semibold w-24">Name</label>
+                <label for="name" class="font-semibold w-24">Name</label>
                 <div style="width:100%">
                     <InputText v-model="name" v-bind="nameProps" class="modal-field flex-auto" autocomplete="off" />
                     <small class="field-error-msg">{{ menuGroupForm.errors.name }}</small>
@@ -55,7 +55,7 @@
         </form>
     </Dialog>
     <Popover ref="menusPopOver" appendTo="body" @hide="groupMenus = []">
-        <DataTable :value="groupMenus" :paginator="true" :rows="5">
+        <DataTable :value="groupMenusComputed" :paginator="true" :rows="5">
             <Column header="No">
                 <template #body="slotProps">
                     {{ slotProps.index + 1 }}
@@ -63,17 +63,9 @@
             </Column>
             <Column field="name" header="Name"></Column>
             <Column field="description" header="Description"></Column>
-            <Column header="Type">
-                <template #body="slotProps">
-                    {{ MenuTypeConverter(slotProps.data.menuType) }}
-                </template>
-            </Column>
+            <Column field="menuType" header="Type"> </Column>
             <Column field="price" header="Price (RM)"></Column>
-            <Column header="Status">
-                <template #body="slotProps">
-                    {{ MenuStatusConverter(slotProps.data.status) }}
-                </template>
-            </Column>
+            <Column field="menuStatus" header="Status"></Column>
         </DataTable>
     </Popover>
 </template>
@@ -93,7 +85,8 @@ import * as yup from 'yup'
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
 import Popover from 'primevue/popover';
-import { MenuStatusConverter, MenuTypeConverter } from '@/utils/enumConverter';
+import { menuStatusConverter, menuTypeConverter } from '@/utils/enumConverter';
+import { computed } from 'vue';
 
 const confirm = useConfirm()
 const axiosStore = useAxiosStore();
@@ -214,6 +207,17 @@ function viewMenuInMenuGroup(event, menuGroup) {
         loader.hide();
     })
 }
+const groupMenusComputed = computed(() => {
+    const data = [];
+    groupMenus.value.forEach((menu) => {
+        data.push({
+            ...menu,
+            menuType: menuTypeConverter(menu.menuType),
+            menuStatus: menuStatusConverter(menu.menuStatus)
+        })
+    })
+    return data;
+})
 getMenuGroupData();
 </script>
 

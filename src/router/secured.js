@@ -18,6 +18,11 @@ export const SecuredRoutes = [
         path: 'menugroup',
         name: 'secured-menugroup',
         component: () => import('@/views/secured/menu/MenuGroupView.vue')
+      },
+      {
+        path: 'menu',
+        name: 'secured-menu',
+        component: () => import('@/views/secured/menu/MenuView.vue')
       }
     ]
   }

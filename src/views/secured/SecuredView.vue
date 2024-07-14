@@ -62,6 +62,13 @@ const menuItem = reactive([
         command: () => {
             router.push({ name: 'secured-menugroup' });
         }
+    },
+    {
+        label: 'Menu',
+        icon: 'pi pi-fw pi-bars',
+        command: () => {
+            router.push({ name: 'secured-menu' });
+        }
     }
 ]);
 
