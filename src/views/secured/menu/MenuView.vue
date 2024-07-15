@@ -80,7 +80,7 @@
                 <Column header="Action">
                     <template #body="slotProps">
                         <Button icon="pi pi-pencil" class="mr-2 p-button-rounded p-button-success"
-                            @click="editMenu(slotProps.data)" title="edit" />
+                            @click="editMenu(slotProps.data.id)" title="edit" />
                         <Button icon="pi pi-image" class="mr-2 p-button-rounded p-button-info"
                             @click="viewMenuImages($event, slotProps.data)" title="view images" />
                         <Button icon="pi pi-trash" class="p-button-rounded p-button-danger"
@@ -90,7 +90,7 @@
             </DataTable>
         </div>
     </div>
-    <MenuDialog v-model:visible="showMenuDialog" />
+    <MenuDialog v-model:visible="showMenuDialog" @afterSave="getMenus" :menuId="menuToUpdateId" />
 </template>
 
 <script setup>
@@ -123,7 +123,7 @@ const tableLoading = ref(false);
 
 const tableFilters = ref();
 const showMenuDialog = ref(false);
-
+const menuToUpdateId = ref(null);
 function initFilters() {
     tableFilters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -145,6 +145,7 @@ function getMenus() {
         });
 }
 function addMenu() {
+    menuToUpdateId.value = null;
     showMenuDialog.value = true;
 }
 function formatCurrency(value) {
@@ -153,7 +154,10 @@ function formatCurrency(value) {
 function clearFilter() {
     initFilters();
 }
-
+function editMenu(id) {
+    menuToUpdateId.value = id;
+    showMenuDialog.value = true;
+}
 onMounted(() => {
     getMenus();
 });

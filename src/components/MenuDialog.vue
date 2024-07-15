@@ -1,6 +1,6 @@
 <template>
-    <Dialog v-model="visible" :header="`${menuId ? 'Update' : 'Add'} Menu`" modal v-model:visible="visible"
-        @hide="onHideDialog" :style="{ 'min-width': '30vw' }">
+    <Dialog v-model="visible" @show="getMenu" :header="`${menuId ? 'Update' : 'Add'} Menu`" modal
+        v-model:visible="visible" @hide="onHideDialog" :style="{ 'min-width': '30vw' }">
         <form novalidate @submit.prevent="saveMenu">
             <div class="grid grid-cols-4 gap-4">
                 <label for="menu.name" class="font-semibold w-24 col-span-1">Name</label>
@@ -69,9 +69,12 @@ import Select from 'primevue/select';
 import { ElUpload } from 'element-plus';
 import 'element-plus/es/components/upload/style/css';
 import Button from 'primevue/button';
+import { useToast } from 'primevue/usetoast';
+import { generateLinkFromFileId } from '@/utils/file';
 
 const axiosStore = useAxiosStore();
 const uploadImageRef = ref();
+const toast = useToast();
 const props = defineProps({
     menuId: String
 })
@@ -85,7 +88,7 @@ const menuForm = useForm({
         menuType: yup.number().required(),
         menuStatus: yup.number().required(),
         price: yup.number().required(),
-        menuGroupId: yup.string().notRequired()
+        "menuGroup.id": yup.string().notRequired()
     },
     ),
     initialValues: {
@@ -94,15 +97,19 @@ const menuForm = useForm({
         menuType: 1,
         menuStatus: 0,
         price: null,
-        menuGroupId: null
+        menuGroup: {
+            id: null
+        }
     }
 })
 
-const existingImageList = ref([{
-    name: 'food.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-    id: "test"
-}]);
+const existingImageList = ref([
+    //     {
+    //     name: 'food.jpeg',
+    //     url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+    //     id: "test"
+    // }
+]);
 const newImageList = ref([]);
 const removedImageIdList = ref([]);
 
@@ -112,7 +119,8 @@ const [description, descriptionProps] = menuForm.defineField('description');
 const [menuType, menuTypeProps] = menuForm.defineField('menuType');
 const [menuStatus, menuStatusProps] = menuForm.defineField('menuStatus');
 const [price, priceProps] = menuForm.defineField('price');
-const [menuGroupId] = menuForm.defineField('menuGroupId');
+const [menuGroupId] = menuForm.defineField('menuGroup.id');
+const emit = defineEmits(['afterSave']);
 
 const menuGroups = ref([]);
 
@@ -193,40 +201,75 @@ function saveMenuDetails() {
             menuGroupId: menuForm.values.menuGroupId
         }).then((response) => {
             const newMenuId = response.data.id;
-            uploadImages(newMenuId, loader);
+            updateImages(newMenuId, loader);
         }).catch(() => {
             loader.hide();
         })
     }
 }
-function uploadImages(newMenuId, loader) {
-    if (newImageList.value.length > 0) {
+function updateImages(menuId, loader) {
+    if (newImageList.value.length > 0 || removedImageIdList.value.length > 0) {
         var formData = new FormData();
         newImageList.value.forEach(file => {
             formData.append('images', file.raw);
         });
-        axiosStore.post(`/api/menu/upload/image`, formData, {
+        const existingIds = existingImageList.value.filter(o => !removedImageIdList.value.includes(o.id)).map(o => o.id);
+        existingIds.forEach(id => {
+            formData.append('existingImageIds', id);
+        });
+        axiosStore.post(`/api/menu/${menuId}/upload/image`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
-        }).then(() => {
-            const imageIds = response.data.map(o => o.id);
-            mapAndDeleteImagesToMenu(imageIds, newMenuId, loader);
-        }).catch(() => {
-            loader.hide();
         })
-            //remove this line after mapAndDeleteImagesToMenu function is implemented
+            .then((response) => {
+                if (response.status === 200) {
+                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving Menu', life: 3000 });
+                }
+                else {
+                    const failedList = response.data.filter(o => !o.success).map(o => `${o.name}${o.extension}`);
+                    toast.add({ severity: 'Warn', summary: 'Warning', detail: `Success on saving menu, but some of the images failed to be uploaded: ${failedList.join(', ')}` });
+                }
+                visible = false;
+                emit('afterSave');
+            })
+            .catch(() => {
+                toast.add({ severity: 'Warn', summary: 'Warn', detail: 'Success in saving menu, but failed in saving the images!' });
+                visible = false;
+                emit('afterSave');
+            })
             .finally(() => {
                 loader.hide();
             })
     }
     else {
+        loader.hide();
         visible.value = false;
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving Menu', life: 3000 });
+        emit('afterSave');
     }
 }
-function mapAndDeleteImagesToMenu(imageIds, menuId, loader) {
-}
+function getMenu() {
+    if (props.menuId) {
+        var loader = axiosStore.loading.show();
+        axiosStore.get(`/api/menu/${props.menuId}`).then((response) => {
+            menuModel.value = response.data;
+            menuForm.setValues(response.data);
+            /**@type array */
+            const images = response.data.images;
+            existingImageList.value = images.map(o => {
+                return {
+                    name: o.name + o.extension,
+                    url: generateLinkFromFileId(o.id, o.name + o.extension),
+                    id: o.id
+                }
+            });
+        }).finally(() => {
+            loader.hide();
+        });
+    }
 
+}
 onMounted(() => {
     GetMenuGroups();
 })
