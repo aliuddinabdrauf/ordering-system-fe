@@ -121,7 +121,7 @@ const [menuStatus, menuStatusProps] = menuForm.defineField('menuStatus');
 const [price, priceProps] = menuForm.defineField('price');
 const [menuGroupId] = menuForm.defineField('menuGroup.id');
 const emit = defineEmits(['afterSave']);
-
+let totalRequest = 0;
 const menuGroups = ref([]);
 
 function onHideDialog() {
@@ -147,12 +147,12 @@ function handleChange(file, fileList) {
 function handleRemove(file, fileList) {
     newImageList.value = fileList;
     if (file.id) {
-        removedImageList.value.push(file.id);
+        removedImageIdList.value.push(file.id);
     }
 }
 function resetForm() {
     if (props.menuId) {
-        menuForm.resetForm(menuModel.value);
+        menuForm.setValues(menuModel.value);
     }
     else {
         menuForm.resetForm();
@@ -176,38 +176,49 @@ function saveMenu() {
 function saveMenuDetails() {
     var loader = axiosStore.loading.show();
     if (props.menuId) {
-        axiosStore.put('/api/menu/update', {
-            id: props.menuId,
+        axiosStore.put(`/api/menu/${props.menuId}`, {
             name: menuForm.values.name,
             description: menuForm.values.description,
             menuType: menuForm.values.menuType,
             menuStatus: menuForm.values.menuStatus,
             price: menuForm.values.price,
-            menuGroupId: menuForm.values.menuGroupId
-        }).then((response) => {
-            visible = false;
-            GetMenus();
-        }).finally(() => {
-            loader.hide();
-        });
+            menuGroupId: menuForm.values.menuGroup?.id
+        }).
+            then((response) => {
+                toast.add({ severity: 'success', summary: 'Success', detail: 'Success updating menu details', life: 3000 });
+            })
+            .catch((error) => {
+                toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating menu details', life: 3000 });
+            })
+            .finally(() => {
+                totalRequest++;
+                if (totalRequest === 2) {
+                    loader.hide();
+                    visible.value = false;
+                    totalRequest = 0;
+                    emit('afterSave');
+                }
+            });
+        updateImages(props.menuId, loader, true);
     }
     else {
-        axiosStore.put('/api/menu/add', {
+        axiosStore.post('/api/menu/add', {
             name: menuForm.values.name,
             description: menuForm.values.description,
             menuType: menuForm.values.menuType,
             menuStatus: menuForm.values.menuStatus,
             price: menuForm.values.price,
-            menuGroupId: menuForm.values.menuGroupId
+            menuGroupId: menuForm.values.menuGroup?.id
         }).then((response) => {
             const newMenuId = response.data.id;
+            toast.add({ severity: 'success', summary: 'Success', detail: 'Success adding menu', life: 3000 });
             updateImages(newMenuId, loader);
         }).catch(() => {
             loader.hide();
         })
     }
 }
-function updateImages(menuId, loader) {
+function updateImages(menuId, loader, isUpdate = false) {
     if (newImageList.value.length > 0 || removedImageIdList.value.length > 0) {
         var formData = new FormData();
         newImageList.value.forEach(file => {
@@ -224,29 +235,32 @@ function updateImages(menuId, loader) {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving Menu', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving images', life: 3000 });
                 }
                 else {
                     const failedList = response.data.filter(o => !o.success).map(o => `${o.name}${o.extension}`);
-                    toast.add({ severity: 'Warn', summary: 'Warning', detail: `Success on saving menu, but some of the images failed to be uploaded: ${failedList.join(', ')}` });
+                    toast.add({ severity: 'Warn', summary: 'Warning', detail: `Some of the images failed to be uploaded: ${failedList.join(', ')}` });
                 }
-                visible = false;
-                emit('afterSave');
             })
             .catch(() => {
-                toast.add({ severity: 'Warn', summary: 'Warn', detail: 'Success in saving menu, but failed in saving the images!' });
-                visible = false;
-                emit('afterSave');
+                toast.add({ severity: 'Error', summary: 'Warn', detail: 'Failed in saving the images!' });
             })
             .finally(() => {
-                loader.hide();
+                totalRequest++;
+                if (isUpdate && totalRequest === 2 || !isUpdate) {
+                    loader.hide();
+                    visible.value = false;
+                    emit('afterSave');
+                }
             })
     }
     else {
-        loader.hide();
-        visible.value = false;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving Menu', life: 3000 });
-        emit('afterSave');
+        totalRequest++;
+        if (isUpdate && totalRequest === 2 || !isUpdate) {
+            loader.hide();
+            visible.value = false;
+            emit('afterSave');
+        }
     }
 }
 function getMenu() {

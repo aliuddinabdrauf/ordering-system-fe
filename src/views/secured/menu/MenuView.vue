@@ -24,8 +24,8 @@
                 <template #empty> No customers found. </template>
                 <template #loading> Loading customers data. Please wait. </template>
                 <Column header="No">
-                    <template #body="slotProps">
-                        {{ slotProps.index + 1 }}
+                    <template #body="{ index }">
+                        {{ index + 1 }}
                     </template>
                 </Column>
                 <Column field="name" sortable header="Name">
@@ -71,26 +71,27 @@
                 </Column>
                 <Column field="price" sortable header="Price">
                     <template #body="{ data }">
-                        {{ formatCurrency(data.price) }}
+                        {{ currencyFormatter(data.price) }}
                     </template>
                     <template #filter="{ filterModel }">
                         <InputNumber v-model="filterModel.value" mode="currency" currency="MYR" locale="my-MY" />
                     </template>
                 </Column>
                 <Column header="Action">
-                    <template #body="slotProps">
+                    <template #body="{ data }">
                         <Button icon="pi pi-pencil" class="mr-2 p-button-rounded p-button-success"
-                            @click="editMenu(slotProps.data.id)" title="edit" />
+                            @click="editMenu(data.id)" title="edit" />
                         <Button icon="pi pi-image" class="mr-2 p-button-rounded p-button-info"
-                            @click="viewMenuImages($event, slotProps.data)" title="view images" />
+                            @click="viewMenuImages(data)" title="view images" />
                         <Button icon="pi pi-trash" class="p-button-rounded p-button-danger"
-                            @click="deleteMenuConfirmation($event, slotProps.data)" title="delete" />
+                            @click="deleteMenuConfirmation($event, data)" title="delete" />
                     </template>
                 </Column>
             </DataTable>
         </div>
     </div>
     <MenuDialog v-model:visible="showMenuDialog" @afterSave="getMenus" :menuId="menuToUpdateId" />
+    <MenuImageGalery v-model:visible="visbleMenuImageGalery" :menu="menuForImageGalery" />
 </template>
 
 <script setup>
@@ -110,17 +111,20 @@ import Tag from 'primevue/tag';
 import Select from 'primevue/select';
 import { menuTypes, menuStatuses } from '@/constants/menu';
 import MenuDialog from '@/components/MenuDialog.vue';
+import { currencyFormatter } from '@/utils/formatter';
+import MenuImageGalery from '@/components/MenuImageGalery.vue';
+import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 
 const breadcrumbStore = useBreadcrumbStore();
 const axiosStore = useAxiosStore();
+const toast = useToast();
+const confirm = useConfirm();
 breadcrumbStore.breadCrumbItem = [
     { label: 'Menu', to: { name: 'secured-menu' } }
 ]
-
 const menus = ref([]);
-
 const tableLoading = ref(false);
-
 const tableFilters = ref();
 const showMenuDialog = ref(false);
 const menuToUpdateId = ref(null);
@@ -134,6 +138,7 @@ function initFilters() {
         price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
     }
 };
+const visbleMenuImageGalery = ref(false);
 initFilters();
 function getMenus() {
     tableLoading.value = true;
@@ -144,12 +149,10 @@ function getMenus() {
             tableLoading.value = false;
         });
 }
+const menuForImageGalery = ref({});
 function addMenu() {
     menuToUpdateId.value = null;
     showMenuDialog.value = true;
-}
-function formatCurrency(value) {
-    return value.toLocaleString('ms-MY', { style: 'currency', currency: 'MYR' });
 }
 function clearFilter() {
     initFilters();
@@ -157,6 +160,40 @@ function clearFilter() {
 function editMenu(id) {
     menuToUpdateId.value = id;
     showMenuDialog.value = true;
+}
+function viewMenuImages(menu) {
+    menuForImageGalery.value = menu;
+    visbleMenuImageGalery.value = true;
+}
+function deleteMenuConfirmation(event, menu) {
+    confirm.require({
+        message: 'Are you sure you want to delete this menu?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        target: event.currentTarget,
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            deleteMenu(menu.id);
+        }
+    });
+}
+function deleteMenu(menuId) {
+    const loader = axiosStore.loading.show();
+    axiosStore.delete(`/api/menu/${menuId}`).then((response) => {
+        toast.add({ severity: 'success', summary: 'Success', detail: 'Success Delete Menu', life: 3000 });
+        getMenus();
+    })
+        .finally(() => {
+            loader.hide();
+        });
 }
 onMounted(() => {
     getMenus();

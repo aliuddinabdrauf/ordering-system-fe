@@ -9,20 +9,20 @@
         <div class="container mx-auto">
             <DataTable :value="menuGroups" :paginator="true" :rows="10" :rowsPerPageOptions="[5, 10, 20]">
                 <Column header="No">
-                    <template #body="slotProps">
-                        {{ slotProps.index + 1 }}
+                    <template #body="{ index }">
+                        {{ index + 1 }}
                     </template>
                 </Column>
                 <Column field="name" header="Name"></Column>
                 <Column field="description" header="Description"></Column>
                 <Column header="Action">
-                    <template #body="slotProps">
-                        <Button icon="pi pi-pencil" class="p-button-rounded p-button-success"
-                            @click="editMenuGroup(slotProps.data)" />
-                        <Button icon="pi pi-trash" class="p-button-rounded p-button-danger"
-                            @click="deleteMenuGroupConfirmation($event, slotProps.data)" />
-                        <Button icon="pi pi-eye" class="p-button-rounded p-button-info"
-                            @click="viewMenuInMenuGroup($event, slotProps.data)" />
+                    <template #body="{ data }">
+                        <Button icon="pi pi-pencil" title="edit" severity="primary" rounded
+                            @click="editMenuGroup(data)" />
+                        <Button icon="pi pi-eye" title="view menu" severity="info" rounded
+                            @click="viewMenuInMenuGroup($event, data)" />
+                        <Button icon="pi pi-trash" title="delete menu" severity="danger" rounded
+                            @click="deleteMenuGroupConfirmation($event, data)" />
                     </template>
                 </Column>
             </DataTable>
@@ -57,14 +57,22 @@
     <Popover ref="menusPopOver" appendTo="body" @hide="groupMenus = []">
         <DataTable :value="groupMenusComputed" :paginator="true" :rows="5">
             <Column header="No">
-                <template #body="slotProps">
-                    {{ slotProps.index + 1 }}
+                <template #body="{ index }">
+                    {{ index + 1 }}
                 </template>
             </Column>
             <Column field="name" header="Name"></Column>
-            <Column field="description" header="Description"></Column>
+            <Column field="description" header="Description">
+                <template #body="{ data }">
+                    <span v-html="data.description"></span>
+                </template>
+            </Column>
             <Column field="menuType" header="Type"> </Column>
-            <Column field="price" header="Price (RM)"></Column>
+            <Column field="price" header="Price">
+                <template #body="{ data }">
+                    {{ currencyFormatter(data.price) }}
+                </template>
+            </Column>
             <Column field="menuStatus" header="Status"></Column>
         </DataTable>
     </Popover>
@@ -75,7 +83,7 @@ import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useAxiosStore } from '@/stores/axios';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
@@ -87,6 +95,7 @@ import { useConfirm } from "primevue/useconfirm";
 import Popover from 'primevue/popover';
 import { menuStatusConverter, menuTypeConverter } from '@/utils/enumConverter';
 import { computed } from 'vue';
+import { currencyFormatter } from '@/utils/formatter';
 
 const confirm = useConfirm()
 const axiosStore = useAxiosStore();
@@ -94,7 +103,6 @@ const toast = useToast();
 const menuGroupModalVisble = ref(false);
 const modalType = ref('');
 const menusPopOver = ref();
-
 const menuGroupForm = reactive(useForm({
     validationSchema: yup.object({
         id: yup.string().optional(),
@@ -103,19 +111,26 @@ const menuGroupForm = reactive(useForm({
     },
     )
 }));
-
 const [name, nameProps] = menuGroupForm.defineField('name');
 const [description, descriptionProps] = menuGroupForm.defineField('description');
 const [id] = menuGroupForm.defineField('id');
-
 const breadcrumbStore = useBreadcrumbStore();
 breadcrumbStore.breadCrumbItem = [
     { label: 'Menu Group', to: { name: 'secured-menugroup' } }
 ]
-
 const menuGroups = ref([]);
 const groupMenus = ref([]);
-
+const groupMenusComputed = computed(() => {
+    const data = [];
+    groupMenus.value.forEach((menu) => {
+        data.push({
+            ...menu,
+            menuType: menuTypeConverter(menu.menuType),
+            menuStatus: menuStatusConverter(menu.menuStatus)
+        })
+    })
+    return data;
+})
 function getMenuGroupData() {
     const loader = axiosStore.loading.show();
     axiosStore.get('/api/menu/group/all').then((response) => {
@@ -143,7 +158,7 @@ function saveMenuGroup() {
         if (result.valid) {
             const loader = axiosStore.loading.show();
             if (modalType.value === 'add') {
-                axiosStore.put('/api/menu/group/add', {
+                axiosStore.post('/api/menu/group/add', {
                     name: menuGroupForm.values.name,
                     description: menuGroupForm.values.description
                 }).then((response) => {
@@ -155,7 +170,7 @@ function saveMenuGroup() {
                 })
             }
             else {
-                axiosStore.patch(`/api/menu/group/update/${id.value}`, {
+                axiosStore.put(`/api/menu/group/${id.value}`, {
                     name: menuGroupForm.values.name,
                     description: menuGroupForm.values.description
                 }).then((response) => {
@@ -191,7 +206,7 @@ function deleteMenuGroupConfirmation(event, menuGroupId) {
 }
 function deleteMenuGroup(menuGroupId) {
     const loader = axiosStore.loading.show();
-    axiosStore.delete(`/api/menu/group/delete/${menuGroupId}`).then((response) => {
+    axiosStore.delete(`/api/menu/group/${menuGroupId}`).then((response) => {
         getMenuGroupData();
         toast.add({ severity: 'success', summary: 'Success', detail: 'Success Delete Menu Group', life: 3000 });
     }).finally(() => {
@@ -207,18 +222,9 @@ function viewMenuInMenuGroup(event, menuGroup) {
         loader.hide();
     })
 }
-const groupMenusComputed = computed(() => {
-    const data = [];
-    groupMenus.value.forEach((menu) => {
-        data.push({
-            ...menu,
-            menuType: menuTypeConverter(menu.menuType),
-            menuStatus: menuStatusConverter(menu.menuStatus)
-        })
-    })
-    return data;
+onMounted(() => {
+    getMenuGroupData();
 })
-getMenuGroupData();
 </script>
 
 <style scoped>
@@ -229,5 +235,9 @@ getMenuGroupData();
 .modal-field {
     width: 100%;
     margin-top: 1rem;
+}
+
+.p-button {
+    margin-right: 0.5rem;
 }
 </style>
