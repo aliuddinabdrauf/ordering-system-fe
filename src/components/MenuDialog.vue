@@ -3,40 +3,40 @@
         v-model:visible="visible" @hide="onHideDialog" :style="{ 'min-width': '30vw' }">
         <form novalidate @submit.prevent="saveMenu">
             <div class="grid grid-cols-4 gap-4">
-                <label for="menu.name" class="font-semibold w-24 col-span-1">Name</label>
+                <label for="menu.name" class="font-semibold w-24 col-span-1">Nama</label>
                 <div class="col-span-3">
                     <InputText id="menu.name" v-model="name" v-bind="nameProps" class="modal-field"
                         autocomplete="off" />
                     <small class="field-error-msg">{{ menuForm.errors.name }}</small>
                 </div>
-                <label for="menu.description" class="font-semibold w-24 col-span-1">Description</label>
+                <label for="menu.description" class="font-semibold w-24 col-span-1">Keterangan</label>
                 <div class="col-span-3">
                     <Editor id="menu.description" v-model="description" v-bind="descriptionProps" class="modal-field" />
                     <small class="field-error-msg">{{ menuForm.errors.description }}</small>
                 </div>
-                <label for="menu.menuType" class="font-semibold w-24 col-span-1">Menu Type</label>
+                <label for="menu.menuType" class="font-semibold w-24 col-span-1">Jenis Menu</label>
                 <div class="col-start-2 col-end-3">
                     <MenuTypeSelect id="menu.menuType" v-model:value="menuType" v-bind="menuTypeProps"
                         class="modal-field" />
                     <small class="field-error-msg">{{ menuForm.errors.menuType }}</small>
                 </div>
-                <label for="menu.menuStatus" class="font-semibold w-24 col-start-1 col-end-2">Menu Status</label>
+                <label for="menu.menuStatus" class="font-semibold w-24 col-start-1 col-end-2">Status Menu</label>
                 <div class="col-start-2 col-end-3">
                     <MenuStatusSelect id="menu.menuStatus" v-model:value="menuStatus" v-bind="menuStatusProps"
                         class="modal-field" />
                     <small class="field-error-msg">{{ menuForm.errors.menuType }}</small>
                 </div>
-                <label for="menu.price" class="font-semibold w-24 col-span-1 col-start-1">Price</label>
+                <label for="menu.price" class="font-semibold w-24 col-span-1 col-start-1">Harga</label>
                 <InputNumber id="menu.price" v-model="price" v-bind="priceProps" inputId="currency-malaysia"
                     mode="currency" currency="MYR" locale="ms-MY" />
                 <small class="field-error-msg">{{ menuForm.errors.price }}</small>
-                <label for="menu.menuGroupId" class="font-semibold w-24 col-span-1 col-start-1">Menu Group</label>
+                <label for="menu.menuGroupId" class="font-semibold w-24 col-span-1 col-start-1">Kumpulan Menu</label>
                 <div class="col-span-2">
                     <Select id="menu.menuGroupId" v-model="menuGroupId" class="modal-field" :options="menuGroups"
                         optionLabel="name" optionValue="id" show-clear />
                     <small class="field-error-msg">{{ menuForm.errors.menuGroupId }}</small>
                 </div>
-                <label for="menu.price" class="font-semibold w-24 col-span-1 col-start-1">Images</label>
+                <label for="menu.price" class="font-semibold w-24 col-span-1 col-start-1">Imej</label>
                 <div class="font-semibold w-24 col-span-3 modal-field">
                     <el-upload ref="uploadImageRef" :file-list="existingImageList" :auto-upload="false" accept="image/*"
                         list-type="picture-card" :on-preview="handlePictureCardPreview" :on-change="handleChange"
@@ -185,10 +185,10 @@ function saveMenuDetails() {
             menuGroupId: menuForm.values.menuGroup?.id
         }).
             then((response) => {
-                toast.add({ severity: 'success', summary: 'Success', detail: 'Success updating menu details', life: 3000 });
+                toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya mengemaskini maklumat menu', life: 3000 });
             })
             .catch((error) => {
-                toast.add({ severity: 'error', summary: 'Error', detail: 'Error updating menu details', life: 3000 });
+                toast.add({ severity: 'error', summary: 'Ralat', detail: 'Ralat dalam mengemaskini maklumat menu', life: 3000 });
             })
             .finally(() => {
                 totalRequest++;
@@ -211,7 +211,7 @@ function saveMenuDetails() {
             menuGroupId: menuForm.values.menuGroup?.id
         }).then((response) => {
             const newMenuId = response.data.id;
-            toast.add({ severity: 'success', summary: 'Success', detail: 'Success adding menu', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya menambah menu', life: 3000 });
             updateImages(newMenuId, loader);
         }).catch(() => {
             loader.hide();
@@ -235,15 +235,15 @@ function updateImages(menuId, loader, isUpdate = false) {
         })
             .then((response) => {
                 if (response.status === 200) {
-                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success saving images', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Success', detail: 'Berjaya menyimpan imej', life: 3000 });
                 }
                 else {
                     const failedList = response.data.filter(o => !o.success).map(o => `${o.name}${o.extension}`);
-                    toast.add({ severity: 'Warn', summary: 'Warning', detail: `Some of the images failed to be uploaded: ${failedList.join(', ')}` });
+                    toast.add({ severity: 'Warn', summary: 'Peringatan', detail: `Sebahagian imej tidak berjaya disimpan: ${failedList.join(', ')}` });
                 }
             })
             .catch(() => {
-                toast.add({ severity: 'Error', summary: 'Warn', detail: 'Failed in saving the images!' });
+                toast.add({ severity: 'Error', summary: 'Peringatan', detail: 'Gagal menyimpan imej!' });
             })
             .finally(() => {
                 totalRequest++;

@@ -5,7 +5,7 @@
                 <div class="flex items-center gap-2">
                     <Avatar icon="pi pi-power-off" style="cursor: pointer;" @click="logout"
                         image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" shape="circle"
-                        title="logout" />
+                        title="log keluar" />
                     <span style="margin-left: 8px;">{{ user.user?.email }}</span>
                 </div>
             </template>
@@ -50,14 +50,14 @@ const breadcrumbStore = useBreadcrumbStore();
 
 const menuItem = reactive([
     {
-        label: 'Home',
+        label: 'Utama',
         icon: 'pi pi-fw pi-home',
         command: () => {
             router.push({ name: 'secured-home' });
         }
     },
     {
-        label: 'Menu Group',
+        label: 'Kumpulan Menu',
         icon: 'pi pi-fw pi-bars',
         command: () => {
             router.push({ name: 'secured-menugroup' });
@@ -79,22 +79,22 @@ const home = reactive({
 
 const logout = (event) => {
     confirm.require({
-        message: 'Are you sure you want to logout?',
-        header: 'Confirmation',
+        message: 'Adakah anda pasti untuk log keluar?',
+        header: 'Pengesahan',
         icon: 'pi pi-exclamation-triangle',
         target: event.currentTarget,
         rejectProps: {
-            label: 'Cancel',
+            label: 'Batal',
             severity: 'secondary',
             outlined: true
         },
         acceptProps: {
-            label: 'Logout'
+            label: 'Log Keluar',
         },
         accept: () => {
             user.logout();
             router.go({ name: 'secured-login' });
-            toast.add({ severity: 'success', summary: 'Success', detail: 'Logout Success', life: 3000 });
+            toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Log keluar berjaya', life: 3000 });
         }
     });
 }

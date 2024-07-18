@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto">
-        <h3>MENU GROUP</h3>
+        <h3>MENU</h3>
     </div>
     <div class="flex flex-row-reverse">
         <div class="container mx-auto">
@@ -15,39 +15,39 @@
                                 <InputIcon>
                                     <i class="pi pi-search" />
                                 </InputIcon>
-                                <InputText v-model="tableFilters['global'].value" placeholder="Keyword Search" />
+                                <InputText v-model="tableFilters['global'].value" placeholder="Kata Carian" />
                             </IconField>
-                            <Button label="Add" icon="pi pi-plus" @click="addMenu" />
+                            <Button label="Tambah" icon="pi pi-plus" @click="addMenu" />
                         </div>
                     </div>
                 </template>
-                <template #empty> No customers found. </template>
-                <template #loading> Loading customers data. Please wait. </template>
+                <template #empty> Tiada rekod di temui </template>
+                <template #loading> Mendapatkan data, sila tunggu... </template>
                 <Column header="No">
                     <template #body="{ index }">
                         {{ index + 1 }}
                     </template>
                 </Column>
-                <Column field="name" sortable header="Name">
+                <Column field="name" sortable header="Nama">
                     <template #filter="{ filterModel }">
-                        <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
+                        <InputText v-model="filterModel.value" type="text" placeholder="Carian Nama" />
                     </template>
                 </Column>
-                <Column field="description" header="Description">
+                <Column field="description" header="Keterangan">
                     <template #filter="{ filterModel }">
-                        <InputText v-model="filterModel.value" type="text" placeholder="Search by name" />
+                        <InputText v-model="filterModel.value" type="text" placeholder="Carian Keterangan" />
                     </template>
                     <template #body="{ data }">
                         <span v-html="data.description"></span>
                     </template>
                 </Column>
-                <Column field="menuType" sortable header="Menu Type">
+                <Column field="menuType" sortable header="Jeni Menu">
                     <template #body="{ data }">
                         <Tag :value="menuTypeConverter(data.menuType)"
                             :severity="menuTypeSeverityConverter(data.menuType)" />
                     </template>
                     <template #filter="{ filterModel }">
-                        <Select v-model="filterModel.value" :options="menuTypes" placeholder="Select One" showClear>
+                        <Select v-model="filterModel.value" :options="menuTypes" placeholder="Pilih Satu" showClear>
                             <template #option="slotProps">
                                 <Tag :value="menuTypeConverter(slotProps.option)"
                                     :severity="menuTypeSeverityConverter(slotProps.option)" />
@@ -55,7 +55,12 @@
                         </Select>
                     </template>
                 </Column>
-                <Column field="menuStatus" sortable header="Menu Status">
+                <Column field="menuGroup.name" sortable header="Kumpulan Menu">
+                    <template #filter="{ filterModel }">
+                        <InputText v-model="filterModel.value" type="text" placeholder="Carian Kumpulan Menu" />
+                    </template>
+                </Column>
+                <Column field="menuStatus" sortable header="Status Menu">
                     <template #body="{ data }">
                         <Tag :value="menuStatusConverter(data.menuStatus)"
                             :severity="menuStatusSeverityConverter(data.menuStatus)" />
@@ -69,7 +74,7 @@
                         </Select>
                     </template>
                 </Column>
-                <Column field="price" sortable header="Price">
+                <Column field="price" sortable header="Harga">
                     <template #body="{ data }">
                         {{ currencyFormatter(data.price) }}
                     </template>
@@ -80,11 +85,11 @@
                 <Column header="Action">
                     <template #body="{ data }">
                         <Button icon="pi pi-pencil" class="mr-2 p-button-rounded p-button-success"
-                            @click="editMenu(data.id)" title="edit" />
+                            @click="editMenu(data.id)" title="Sunting" />
                         <Button icon="pi pi-image" class="mr-2 p-button-rounded p-button-info"
-                            @click="viewMenuImages(data)" title="view images" />
+                            @click="viewMenuImages(data)" title="Lihat Imej" />
                         <Button icon="pi pi-trash" class="p-button-rounded p-button-danger"
-                            @click="deleteMenuConfirmation($event, data)" title="delete" />
+                            @click="deleteMenuConfirmation($event, data)" title="Padam" />
                     </template>
                 </Column>
             </DataTable>
@@ -136,6 +141,7 @@ function initFilters() {
         menuType: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         menuStatus: { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
         price: { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] },
+        'menuGroup.name': { operator: FilterOperator.OR, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] }
     }
 };
 const visbleMenuImageGalery = ref(false);
@@ -167,17 +173,17 @@ function viewMenuImages(menu) {
 }
 function deleteMenuConfirmation(event, menu) {
     confirm.require({
-        message: 'Are you sure you want to delete this menu?',
-        header: 'Confirmation',
+        message: 'Adakah anda pasti untuk memadam menu ini?',
+        header: 'Pengesahan',
         icon: 'pi pi-exclamation-triangle',
         target: event.currentTarget,
         rejectProps: {
-            label: 'Cancel',
+            label: 'Batal',
             severity: 'secondary',
             outlined: true
         },
         acceptProps: {
-            label: 'Delete',
+            label: 'Padam',
             severity: 'danger'
         },
         accept: () => {
@@ -188,7 +194,7 @@ function deleteMenuConfirmation(event, menu) {
 function deleteMenu(menuId) {
     const loader = axiosStore.loading.show();
     axiosStore.delete(`/api/menu/${menuId}`).then((response) => {
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Success Delete Menu', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya memadam menu', life: 3000 });
         getMenus();
     })
         .finally(() => {

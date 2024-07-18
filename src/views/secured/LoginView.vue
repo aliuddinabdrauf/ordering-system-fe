@@ -2,17 +2,17 @@
   <div class="login-container">
     <Card style="width: 25rem; overflow: hidden">
       <template #title>
-        <div style="display:flex;justify-content: center;">LOGIN</div>
+        <div style="display:flex;justify-content: center;">LOG MASUK</div>
       </template>
       <template #content>
         <form novalidate @submit.prevent="onSubmit">
-          <InputText class="login-field" v-bind="emailProps" v-model="email" type="email" placeholder="Email" />
+          <InputText class="login-field" v-bind="emailProps" v-model="email" type="email" placeholder="Emel" />
           <small class="field-error-msg">{{ loginForm.errors.email }}</small>
           <InputText class="login-field" v-bind="passwordProps" v-model="passowrd" type="password"
-            placeholder="Password" />
+            placeholder="Kata laluan" />
           <small class="field-error-msg">{{ loginForm.errors.password }}</small>
           <div>
-            <Button class="login-field" type="submit" label="Login" />
+            <Button class="login-field" type="submit" label="Log Masuk" />
           </div>
         </Form>
       </template>
@@ -52,7 +52,7 @@ function onSubmit() {
       const loader = axiosStore.loading.show();
       axiosStore.post('/api/authenticate/login', loginForm.values).then((response) => {
         user.authToken = response.data.token;
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Login Success', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Log masuk berjaya', life: 3000 });
         router.push({ name: 'secured-home' });
       }).catch((error) => {
       })

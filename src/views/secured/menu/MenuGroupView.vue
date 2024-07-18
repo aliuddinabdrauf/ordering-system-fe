@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto">
-        <h3>MENU GROUP</h3>
+        <h3>KUMPULAN MENU</h3>
         <div class="flex flex-row-reverse">
             <div>
                 <Button label="Add" icon="pi pi-plus" @click="addMenuGroupModal" />
@@ -13,15 +13,15 @@
                         {{ index + 1 }}
                     </template>
                 </Column>
-                <Column field="name" header="Name"></Column>
-                <Column field="description" header="Description"></Column>
+                <Column field="name" header="Nama"></Column>
+                <Column field="description" header="Keterangan"></Column>
                 <Column header="Action">
                     <template #body="{ data }">
-                        <Button icon="pi pi-pencil" title="edit" severity="primary" rounded
+                        <Button icon="pi pi-pencil" title="Sunting" severity="primary" rounded
                             @click="editMenuGroup(data)" />
-                        <Button icon="pi pi-eye" title="view menu" severity="info" rounded
+                        <Button icon="pi pi-eye" title="Lihat menu" severity="info" rounded
                             @click="viewMenuInMenuGroup($event, data)" />
-                        <Button icon="pi pi-trash" title="delete menu" severity="danger" rounded
+                        <Button icon="pi pi-trash" title="Padam menu" severity="danger" rounded
                             @click="deleteMenuGroupConfirmation($event, data)" />
                     </template>
                 </Column>
@@ -29,18 +29,18 @@
         </div>
     </div>
     <Dialog v-model:visible="menuGroupModalVisble" modal
-        :header="`${modalType === 'add' ? 'Add' : 'Update'} Menu Group`" @hide="menuGroupForm.resetField"
+        :header="`${modalType === 'add' ? 'Tambah' : 'Kemaskini'} Kumpulan Menu`" @hide="menuGroupForm.resetField"
         :style="{ width: '25rem' }">
         <form novalidate @submit.prevent="saveMenuGroup" style="width:100%">
             <div class="flex items-center gap-4 mb-4">
-                <label for="name" class="font-semibold w-24">Name</label>
+                <label for="name" class="font-semibold w-24">Nama</label>
                 <div style="width:100%">
                     <InputText v-model="name" v-bind="nameProps" class="modal-field flex-auto" autocomplete="off" />
                     <small class="field-error-msg">{{ menuGroupForm.errors.name }}</small>
                 </div>
             </div>
             <div class="flex items-center gap-4 mb-8">
-                <label for="email" class="font-semibold w-24">Description</label>
+                <label for="email" class="font-semibold w-24">Keterangan</label>
                 <div style="width:100%">
                     <Textarea v-model="description" v-bind="descriptionProps" class="modal-field flex-auto"
                         autocomplete="off" />
@@ -48,9 +48,8 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2">
-                <Button type="button" label="Cancel" severity="secondary"
-                    @click="menuGroupModalVisble = false"></Button>
-                <Button type="submit" label="Save"></Button>
+                <Button type="button" label="Batal" severity="secondary" @click="menuGroupModalVisble = false"></Button>
+                <Button type="submit" label="Simpan"></Button>
             </div>
         </form>
     </Dialog>
@@ -61,14 +60,14 @@
                     {{ index + 1 }}
                 </template>
             </Column>
-            <Column field="name" header="Name"></Column>
-            <Column field="description" header="Description">
+            <Column field="name" header="Nama"></Column>
+            <Column field="description" header="Keterangan">
                 <template #body="{ data }">
                     <span v-html="data.description"></span>
                 </template>
             </Column>
-            <Column field="menuType" header="Type"> </Column>
-            <Column field="price" header="Price">
+            <Column field="menuType" header="Jenis"> </Column>
+            <Column field="price" header="Harga">
                 <template #body="{ data }">
                     {{ currencyFormatter(data.price) }}
                 </template>
@@ -116,7 +115,7 @@ const [description, descriptionProps] = menuGroupForm.defineField('description')
 const [id] = menuGroupForm.defineField('id');
 const breadcrumbStore = useBreadcrumbStore();
 breadcrumbStore.breadCrumbItem = [
-    { label: 'Menu Group', to: { name: 'secured-menugroup' } }
+    { label: 'Kumpulan Menu', to: { name: 'secured-menugroup' } }
 ]
 const menuGroups = ref([]);
 const groupMenus = ref([]);
@@ -163,7 +162,7 @@ function saveMenuGroup() {
                     description: menuGroupForm.values.description
                 }).then((response) => {
                     getMenuGroupData();
-                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success Add Menu Group', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya menambah kumpulan menu', life: 3000 });
                     menuGroupModalVisble.value = false;
                 }).finally(() => {
                     loader.hide();
@@ -175,7 +174,7 @@ function saveMenuGroup() {
                     description: menuGroupForm.values.description
                 }).then((response) => {
                     getMenuGroupData();
-                    toast.add({ severity: 'success', summary: 'Success', detail: 'Success Update Menu Group', life: 3000 });
+                    toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya mengemaskini kumpulan menu', life: 3000 });
                     menuGroupModalVisble.value = false;
                 }).finally(() => {
                     loader.hide();
@@ -186,17 +185,17 @@ function saveMenuGroup() {
 }
 function deleteMenuGroupConfirmation(event, menuGroupId) {
     confirm.require({
-        message: 'Are you sure you want to delete this menu group?',
-        header: 'Confirmation',
+        message: 'Adakah anda pasti ingin memadam kumpulan menu ini?',
+        header: 'Pengesahan',
         icon: 'pi pi-exclamation-triangle',
         target: event.currentTarget,
         rejectProps: {
-            label: 'Cancel',
+            label: 'Batal',
             severity: 'secondary',
             outlined: true
         },
         acceptProps: {
-            label: 'Delete',
+            label: 'Padam',
             severity: 'danger'
         },
         accept: () => {
@@ -208,7 +207,7 @@ function deleteMenuGroup(menuGroupId) {
     const loader = axiosStore.loading.show();
     axiosStore.delete(`/api/menu/group/${menuGroupId}`).then((response) => {
         getMenuGroupData();
-        toast.add({ severity: 'success', summary: 'Success', detail: 'Success Delete Menu Group', life: 3000 });
+        toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya memadam kumpulan menu', life: 3000 });
     }).finally(() => {
         loader.hide();
     })

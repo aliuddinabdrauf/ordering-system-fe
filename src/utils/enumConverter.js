@@ -6,13 +6,13 @@
 function menuTypeConverter(type) {
   switch (type) {
     case 1:
-      return 'Main Course'
+      return 'Menu Utama'
     case 2:
-      return 'Drinks'
+      return 'Minuman'
     case 3:
-      return 'Dessert'
+      return 'Pencuci Mulut'
     default:
-      return 'Others'
+      return 'Lain-lain'
   }
 }
 
@@ -36,13 +36,13 @@ function menuTypeSeverityConverter(type) {
 function menuStatusConverter(type) {
   switch (type) {
     case 1:
-      return 'Not Active'
+      return 'Tidak Aktif'
     case 2:
-      return 'Not Available'
+      return 'Tidak Tersedia'
     case 3:
-      return 'Sold Out'
+      return 'Habis Terjual'
     default:
-      return 'Available'
+      return 'Tersedia'
   }
 }
 function menuStatusSeverityConverter(type) {
