@@ -4,6 +4,12 @@ const menuTypes = [
   2, //Drinks
   3 //Dessert
 ]
+const menuTypesObj = {
+  Others: 0,
+  MainCourse: 1,
+  Drinks: 2,
+  Dessert: 3
+}
 
 const menuStatuses = [
   0, //Available
@@ -12,4 +18,4 @@ const menuStatuses = [
   3 //Sold Out
 ]
 
-export { menuTypes, menuStatuses }
+export { menuTypes, menuTypesObj, menuStatuses }

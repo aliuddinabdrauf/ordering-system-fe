@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { SecuredRoutes } from './secured'
+import { publicRoutes } from './public'
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [...SecuredRoutes]
+  routes: [...SecuredRoutes, ...publicRoutes]
 })
 
 router.beforeEach((to, from, next) => {

@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto">
-        <h3>MENU</h3>
+        <h3>TETAPAN MENU</h3>
     </div>
     <div class="flex flex-row-reverse">
         <div class="container mx-auto">
@@ -82,7 +82,7 @@
                         <InputNumber v-model="filterModel.value" mode="currency" currency="MYR" locale="my-MY" />
                     </template>
                 </Column>
-                <Column header="Action">
+                <Column header="Tindakan">
                     <template #body="{ data }">
                         <Button icon="pi pi-pencil" class="mr-2 p-button-rounded p-button-success"
                             @click="editMenu(data.id)" title="Sunting" />
@@ -115,9 +115,9 @@ import InputNumber from 'primevue/inputnumber';
 import Tag from 'primevue/tag';
 import Select from 'primevue/select';
 import { menuTypes, menuStatuses } from '@/constants/menu';
-import MenuDialog from '@/components/MenuDialog.vue';
+import MenuDialog from '@/components/menu/MenuDialog.vue';
 import { currencyFormatter } from '@/utils/formatter';
-import MenuImageGalery from '@/components/MenuImageGalery.vue';
+import MenuImageGalery from '@/components/menu/MenuImageGalery.vue';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
 

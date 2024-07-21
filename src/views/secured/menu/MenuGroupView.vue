@@ -1,6 +1,6 @@
 <template>
     <div class="container mx-auto">
-        <h3>KUMPULAN MENU</h3>
+        <h3>TETAPAN UMPULAN MENU</h3>
         <div class="flex flex-row-reverse">
             <div>
                 <Button label="Add" icon="pi pi-plus" @click="addMenuGroupModal" />
@@ -15,7 +15,7 @@
                 </Column>
                 <Column field="name" header="Nama"></Column>
                 <Column field="description" header="Keterangan"></Column>
-                <Column header="Action">
+                <Column header="Tindakan">
                     <template #body="{ data }">
                         <Button icon="pi pi-pencil" title="Sunting" severity="primary" rounded
                             @click="editMenuGroup(data)" />

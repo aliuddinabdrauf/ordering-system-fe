@@ -1,6 +1,6 @@
 <template>
-    <Dialog v-model="visible" @show="getMenu" :header="`${menuId ? 'Update' : 'Add'} Menu`" modal
-        v-model:visible="visible" @hide="onHideDialog" :style="{ 'min-width': '30vw' }">
+    <Dialog @show="getMenu" :header="`${menuId ? 'Sunting' : 'Tambah'} Menu`" modal v-model:visible="visible"
+        @hide="onHideDialog" :style="{ 'min-width': '30vw' }">
         <form novalidate @submit.prevent="saveMenu">
             <div class="grid grid-cols-4 gap-4">
                 <label for="menu.name" class="font-semibold w-24 col-span-1">Nama</label>
@@ -45,9 +45,9 @@
                     </el-upload>
                 </div>
                 <div class="col-span-4 flex justify-end gap-2">
-                    <Button type="button" label="Reset" severity="info" @click="resetForm" />
-                    <Button type="button" label="Cancel" severity="secondary" @click="visible = false" />
-                    <Button type="submit" label="Save" />
+                    <Button type="button" label="Tetap Semula" severity="info" @click="resetForm" />
+                    <Button type="button" label="Batal" severity="secondary" @click="visible = false" />
+                    <Button type="submit" label="Simpan" />
                 </div>
             </div>
         </form>
@@ -62,8 +62,8 @@ import * as yup from 'yup';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import Editor from 'primevue/editor';
-import MenuTypeSelect from '@/components/MenuTypeSelect.vue';
-import MenuStatusSelect from '@/components/MenuStatusSelect.vue';
+import MenuTypeSelect from '@/components/menu/MenuTypeSelect.vue';
+import MenuStatusSelect from '@/components/menu/MenuStatusSelect.vue';
 import { useAxiosStore } from '@/stores/axios';
 import Select from 'primevue/select';
 import { ElUpload } from 'element-plus';
@@ -80,7 +80,7 @@ const props = defineProps({
 })
 const menuModel = ref({});
 const visible = defineModel('visible', { type: Boolean });
-const menuForm = useForm({
+const menuForm = reactive(useForm({
     validationSchema: yup.object({
         id: yup.string().optional(),
         name: yup.string().max(100).required(),
@@ -101,7 +101,7 @@ const menuForm = useForm({
             id: null
         }
     }
-})
+}));
 
 const existingImageList = ref([
     //     {
@@ -168,7 +168,6 @@ function resetImages() {
 function saveMenu() {
     menuForm.validate().then((result) => {
         if (result.valid) {
-            console.log("ddd");
             saveMenuDetails();
         }
     });
@@ -290,6 +289,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.field-error-msg {
+    color: red;
+}
+
 .modal-field {
     width: 100%;
 }

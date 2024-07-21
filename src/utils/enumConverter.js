@@ -6,7 +6,7 @@
 function menuTypeConverter(type) {
   switch (type) {
     case 1:
-      return 'Menu Utama'
+      return 'Santapan Utama'
     case 2:
       return 'Minuman'
     case 3:

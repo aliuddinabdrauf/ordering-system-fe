@@ -69,6 +69,13 @@ const menuItem = reactive([
         command: () => {
             router.push({ name: 'secured-menu' });
         }
+    },
+    {
+        label: 'Meja',
+        icon: 'pi pi-fw pi-bars',
+        command: () => {
+            router.push({ name: 'secured-table' });
+        }
     }
 ]);
 

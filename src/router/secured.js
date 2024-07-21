@@ -23,6 +23,11 @@ export const SecuredRoutes = [
         path: 'menu',
         name: 'secured-menu',
         component: () => import('@/views/secured/menu/MenuView.vue')
+      },
+      {
+        path: 'table',
+        name: 'secured-table',
+        component: () => import('@/views/secured/table/TableView.vue')
       }
     ]
   }
