@@ -37,7 +37,7 @@
 
 <script setup>
 import Card from 'primevue/card';
-import { defineProps, computed, ref, watch, onMounted } from 'vue';
+import { computed, ref, watch, onMounted } from 'vue';
 import { generateLinkFromFileId } from '@/utils/file';
 import { menuTypesObj } from '@/constants/menu';
 import mainCourseImg from '@/assets/images/default_main_course.jpg';
@@ -88,8 +88,7 @@ function checkOverflow() {
     }
 };
 function addToCart() {
-    orderStore.addMenuToCart(props.menu);
-    totalInCart.value = orderStore.getTotalMenuInCart(props.menu.id);
+    orderStore.addOrder(props.menu);
 }
 watch(showFullText, () => {
     if (showFullText.value) {
@@ -101,9 +100,12 @@ watch(showFullText, () => {
         checkOverflow(); // Re-check overflow in case of dynamic content changes
     }
 });
+watch(orderStore.orderList, () => {
+    totalInCart.value = orderStore.totalOrderById(props.menu.id);
+});
 onMounted(() => {
     checkOverflow();
-    totalInCart.value = orderStore.getTotalMenuInCart(props.menu.id);
+    totalInCart.value = orderStore.totalOrderById(props.menu.id);
 });
 </script>
 

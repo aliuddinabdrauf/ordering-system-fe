@@ -11,5 +11,4 @@ function generateLinkFromFileId(fileId, fileName) {
   }
   return link
 }
-
 export { generateLinkFromFileId }

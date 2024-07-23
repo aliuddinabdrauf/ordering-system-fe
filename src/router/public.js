@@ -7,7 +7,7 @@ export const publicRoutes = [
       {
         path: ':tableId',
         name: 'public-order',
-        component: () => import('@/views/public/OrderView.vue')
+        component: () => import('@/views/public/order/OrderView.vue')
       }
     ]
   }
