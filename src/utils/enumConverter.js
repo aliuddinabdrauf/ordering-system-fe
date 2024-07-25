@@ -58,9 +58,36 @@ function menuStatusSeverityConverter(type) {
   }
 }
 
+function orderStatusConverter(type) {
+  switch (type) {
+    case 1:
+      return 'Menyediakan'
+    case 2:
+      return 'Dihidangkan'
+    case 3:
+      return 'Ditolak'
+    default:
+      return 'Dipesan'
+  }
+}
+function orderStatusSeverityConverter(type) {
+  switch (type) {
+    case 1:
+      return 'warn'
+    case 2:
+      return 'primary'
+    case 3:
+      return 'danger'
+    default:
+      return 'info'
+  }
+}
+
 export {
   menuTypeConverter,
   menuStatusSeverityConverter,
   menuStatusConverter,
-  menuTypeSeverityConverter
+  menuTypeSeverityConverter,
+  orderStatusConverter,
+  orderStatusSeverityConverter
 }
