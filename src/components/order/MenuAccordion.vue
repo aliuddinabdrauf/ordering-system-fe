@@ -32,7 +32,6 @@ const menuType = reactive([
     { label: "Lain-lain", value: '0', menusByGroup: [] },
 ]);
 const activeAccordion = ref(menuType.map((item) => item.value));
-
 function getAllMenus() {
     const loading = axiosStore.loading.show();
     axiosStore.get('/api/menu/all/groupByType', { params: { activeOnly: true } })
@@ -61,7 +60,6 @@ function groupingMenu(menus) {
     }
     return groupedMenus;
 }
-
 onMounted(() => {
     getAllMenus();
 });

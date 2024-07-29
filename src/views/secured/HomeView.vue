@@ -50,6 +50,7 @@ breadcrumbStore.breadCrumbItem = []
 
 function onReceiveNewOrder(orders) {
     for (const order of orders) {
+        console.log(order);
         activeOrders.value.push({
             ...order,
             tableName: allTables.value.find(table => table.id === order.tableId).number
@@ -73,6 +74,7 @@ function assignOrders(orders) {
         const table = allTables.value.find(table => table.id === order.tableId);
         return {
             ...order,
+
             tableName: table?.number
         }
     })
