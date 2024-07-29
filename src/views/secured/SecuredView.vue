@@ -76,6 +76,13 @@ const menuItem = reactive([
         command: () => {
             router.push({ name: 'secured-table' });
         }
+    },
+    {
+        label: 'Pembayaran',
+        icon: 'pi pi-fw pi-bars',
+        command: () => {
+            router.push({ name: 'secured-payment' });
+        }
     }
 ]);
 

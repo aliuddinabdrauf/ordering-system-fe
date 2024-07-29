@@ -82,6 +82,26 @@ function orderStatusSeverityConverter(type) {
       return 'info'
   }
 }
+function paymentTypeConverter(type) {
+  switch (type) {
+    case 1:
+      return 'QR'
+    case 2:
+      return 'Kad'
+    default:
+      return 'Tunai'
+  }
+}
+function paymentTypeSeverityConverter(type) {
+  switch (type) {
+    case 1:
+      return 'warn'
+    case 2:
+      return 'primary'
+    default:
+      return 'info'
+  }
+}
 
 export {
   menuTypeConverter,
@@ -89,5 +109,7 @@ export {
   menuStatusConverter,
   menuTypeSeverityConverter,
   orderStatusConverter,
-  orderStatusSeverityConverter
+  orderStatusSeverityConverter,
+  paymentTypeConverter,
+  paymentTypeSeverityConverter
 }

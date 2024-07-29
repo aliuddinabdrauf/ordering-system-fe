@@ -13,6 +13,7 @@ import { useUserStore } from '@/stores/user';
 import { useAxiosStore } from '@/stores/axios';
 import { onMounted, ref, computed } from 'vue';
 import OrderCard from '@/components/order/OrderCard.vue';
+import { orderStatus } from '@/constants/order';
 
 const userStore = useUserStore();
 const axiosStore = useAxiosStore();
@@ -48,10 +49,22 @@ const breadcrumbStore = useBreadcrumbStore();
 breadcrumbStore.breadCrumbItem = []
 
 function onReceiveNewOrder(order) {
-
+    activeOrders.value.push({
+        ...order,
+        tableName: allTables.value.find(table => table.id === order.tableId).number
+    })
 }
-function onUpdatedOrderStatus() {
-
+function onUpdatedOrderStatus(order, timer) {
+    setTimeout(() => {
+        const index = activeOrders.value.findIndex(o => o.id === order.id);
+        if (index !== -1 && order.status !== orderStatus.PLACED && order.status !== orderStatus.PREPARING) {
+            activeOrders.value.splice(index, 1);
+        }
+        else if (index !== -1) {
+            activeOrders.value[index].status = order.status;
+            activeOrders.value[index].version = order.version;
+        }
+    }, timer);
 }
 function assignOrders(orders) {
     activeOrders.value = orders.map(order => {

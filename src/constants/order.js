@@ -6,4 +6,10 @@ const orderStatus = {
   PAID: 4
 }
 
-export { orderStatus }
+const paymentType = {
+  CASH: 0,
+  QR_SCAN: 1,
+  CARD: 2
+}
+
+export { orderStatus, paymentType }

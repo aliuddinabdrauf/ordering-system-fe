@@ -20,7 +20,7 @@
                         <Tag :value="orderStatusConverter(value)" :severity="orderStatusSeverityConverter(value)" />
                     </template>
                 </Select>
-                <Button icon="pi pi-save" text></Button>
+                <Button icon="pi pi-save" @click="saveOrderSatusChange" text></Button>
             </div>
         </template>
     </Card>
@@ -33,7 +33,11 @@ import { orderStatusConverter, orderStatusSeverityConverter } from '@/utils/enum
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import Button from 'primevue/button';
+import { useAxiosStore } from '@/stores/axios';
+import { useToast } from 'primevue/usetoast';
 
+const axiosStore = useAxiosStore();
+const toast = useToast();
 const order = defineModel("order", {
     type: Object,
     required: true
@@ -45,6 +49,16 @@ const statusDropdownItems = [
     { value: orderStatus.COMPLETED, label: orderStatusConverter(orderStatus.COMPLETED), severity: orderStatusSeverityConverter(orderStatus.COMPLETED) },
     { value: orderStatus.REJECTED, label: orderStatusConverter(orderStatus.REJECTED), severity: orderStatusSeverityConverter(orderStatus.REJECTED) }
 ]
+function saveOrderSatusChange() {
+    const loading = axiosStore.loading.show();
+    axiosStore.patch(`/api/order/${order.value.version}/${order.value.id}/${order.value.status}`)
+        .then(() => {
+            toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya mengemaskini status pesanan' });
+        })
+        .finally(() => {
+            loading.hide();
+        })
+}
 </script>
 
 <style scoped></style>

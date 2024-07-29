@@ -28,6 +28,11 @@ export const SecuredRoutes = [
         path: 'table',
         name: 'secured-table',
         component: () => import('@/views/secured/table/TableView.vue')
+      },
+      {
+        path: 'payment',
+        name: 'secured-payment',
+        component: () => import('@/views/secured/payment/PaymentView.vue')
       }
     ]
   }

@@ -32,7 +32,7 @@
                     <Button class="action-button" icon="pi pi-trash" title="Padam" severity="danger"
                         @click="deleteConfirm($event, data.id)" />
                     <Button class="action-button" icon="pi pi-image" severity="info" eye title="Hasilkan Kod QR"
-                        @click="GenerateQRCode(data.link)" />
+                        @click="generateQRCode(data)" />
                 </template>
             </column>
         </DataTable>
@@ -51,11 +51,13 @@ import { useToast } from 'primevue/usetoast';
 import { useAxiosStore } from '@/stores/axios';
 import TableDialog from '@/components/table/TableDialog.vue';
 import { useConfirm } from 'primevue/useconfirm';
+import { useRouter } from 'vue-router';
 
 const breadcrumbStore = useBreadcrumbStore();
 const axiosStore = useAxiosStore();
 const confirm = useConfirm();
 const toast = useToast();
+const router = useRouter();
 const tableData = ref([]);
 const tableLoading = ref(false);
 const tableDataComputed = computed(() => {
@@ -78,7 +80,7 @@ function editTable(data) {
 }
 function afterSave() {
     tableIdToEdit.value = null;
-    GetTables();
+    getTables();
 }
 
 function deleteConfirm(event, id) {
@@ -104,7 +106,7 @@ function deleteConfirm(event, id) {
 function deleteTable(id) {
     const loader = axiosStore.loading.show();
     axiosStore.delete(`/api/table/${id}`).then(() => {
-        GetTables();
+        getTables();
         toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya memadam meja', life: 3000 });
     }).finally(() => {
         loader.hide();
@@ -115,7 +117,7 @@ breadcrumbStore.breadCrumbItem = [
     { label: 'Meja', to: { name: 'secured-table' } }
 ]
 
-function GetTables() {
+function getTables() {
     tableLoading.value = true;
     axiosStore.get('/api/table/all').then((response) => {
         tableData.value = response.data;
@@ -125,9 +127,38 @@ function GetTables() {
         tableLoading.value = false;
     })
 }
+function generateQRCode(table) {
+    const link = router.resolve(table.link).href;
+    const loading = axiosStore.loading.show();
+    axiosStore.get(`/api/table/${table.id}/qrcode`, {
+        params: {
+            link
+        },
+        responseType: 'blob'
+    })
+        .then((response) => {
+            toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya menghasilkan kod QR', life: 3000 });
+            //from : https://stackoverflow.com/questions/41938718/how-to-download-files-using-axios
+            // create file link in browser's memory
+            const href = URL.createObjectURL(response.data);
 
+            // create "a" HTML element with href to file & click
+            const link = document.createElement('a');
+            link.href = href;
+            link.setAttribute('download', 'qrImage.png'); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+
+            // clean up "a" element & remove ObjectURL
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+        })
+        .finally(() => {
+            loading.hide();
+        })
+}
 onMounted(() => {
-    GetTables();
+    getTables();
 })
 </script>
 
