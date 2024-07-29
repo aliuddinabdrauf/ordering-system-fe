@@ -36,7 +36,7 @@ export const useOrderStore = defineStore('order', () => {
     return orderList.value.find((order) => order.id === menuId)?.quantity ?? 0
   }
   function clearOrder() {
-    orderList.value = []
+    orderList.value.splice(0, orderList.value.length)
   }
   return {
     orderList,

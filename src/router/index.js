@@ -8,13 +8,14 @@ const router = createRouter({
   routes: [...SecuredRoutes, ...publicRoutes]
 })
 
+const adminOnlyPage = ['secured-menugroup', 'secured-menu', 'secured-table', 'secured-payment']
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   if (to.name !== 'secured-login' && to.fullPath.includes('/secured')) {
     if (!userStore.isAuthenticated) {
       next({ name: 'secured-login' })
     } else {
-      if (!userStore.isAdmin && to.fullPath.includes('/secured/menugroup')) {
+      if (!userStore.isAdmin && adminOnlyPage.includes(to.name)) {
         return
       } else {
         next()

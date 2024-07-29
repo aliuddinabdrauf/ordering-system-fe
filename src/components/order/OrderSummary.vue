@@ -1,23 +1,30 @@
 <template>
-    <Dialog v-model:visible="visible" modal header="Ikhtisas Pesanan" class="w-11/12 xl:w-4/6" >
+    <Dialog v-model:visible="visible" modal header="Ikhtisas Pesanan" class="w-11/12 xl:w-4/6">
         <div class="container mx-auto">
             <DataView :value="orderStore.orderList" :rows="10">
                 <template #list="slotProps">
                     <div class="flex flex-col">
                         <div v-for="(item, index) in slotProps.items" :key="index">
-                            <div class="flex flex-row items-center p-6 gap-4" :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
+                            <div class="flex flex-row items-center p-6 gap-4"
+                                :class="{ 'border-t border-surface-200 dark:border-surface-700': index !== 0 }">
                                 <div class="w-40 relative">
-                                    <img class="block xl:block mx-auto rounded w-full" :src="getFirstOrDefaultImage(item)" :alt="item.name" />
-                                    <Tag :value="menuStatusConverter(item.menuStatus)" :severity="menuStatusSeverityConverter(item.menuStatus)" class="absolute dark:!bg-surface-900" style="left: 4px; top: 4px"></Tag>
+                                    <img class="block xl:block mx-auto rounded w-full"
+                                        :src="getFirstOrDefaultImage(item)" :alt="item.name" />
+                                    <Tag :value="menuStatusConverter(item.menuStatus)"
+                                        :severity="menuStatusSeverityConverter(item.menuStatus)"
+                                        class="absolute dark:!bg-surface-900" style="left: 4px; top: 4px"></Tag>
                                 </div>
                                 <div class="flex flex-row justify-between items-center flex-1 gap-6">
                                     <div class="flex flex-col justify-between items-start gap-2">
                                         <div>
-                                            <span class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{menuTypeConverter(item.menuType)}}</span>
+                                            <span
+                                                class="font-medium text-surface-500 dark:text-surface-400 text-sm">{{ menuTypeConverter(item.menuType) }}</span>
                                             <div class="text-lg font-medium mt-2">{{ item.name }}</div>
                                         </div>
                                         <div>
-                                            <span class="font-medium text-surface-500 dark:text-surface-400 text-sm hidden xl:block" v-html="item.description"></span>
+                                            <span
+                                                class="font-medium text-surface-500 dark:text-surface-400 text-sm hidden xl:block"
+                                                v-html="item.description"></span>
                                         </div>
                                         <div>
                                             <Textarea v-model="item.note" placeholder="Nota...." />
@@ -25,13 +32,16 @@
                                     </div>
                                     <div class="flex flex-col items-end gap-8">
                                         <div class="flex flex-col items-end">
-                                        <span class="text-md font-semibold">{{ currencyFormatter(item.price) }}</span>
-                                        <span class="text-md font-semibold">Total: {{ currencyFormatter(item.totalPrice) }}</span>
+                                            <span class="text-md font-semibold">{{ currencyFormatter(item.price)
+                                                }}</span>
+                                            <span class="text-md font-semibold">Total: {{
+                                                currencyFormatter(item.totalPrice) }}</span>
                                         </div>
                                         <div>
                                         </div>
                                         <div class="flex flex-row gap-2">
-                                            <InputNumber v-model="item.quantity" size="small" showButtons buttonLayout="vertical" style="width:3rem" :min="1" :max="99">
+                                            <InputNumber v-model="item.quantity" size="small" showButtons
+                                                buttonLayout="vertical" style="width:3rem" :min="1" :max="99">
                                                 <template #incrementicon>
                                                     <span class="pi pi-plus" />
                                                 </template>
@@ -39,7 +49,9 @@
                                                     <span class="pi pi-minus" />
                                                 </template>
                                             </InputNumber>
-                                            <Button icon="pi pi-trash" severity="danger" class="flex-initial whitespace-nowrap" @click="deleteOrderItem($event, item)"></Button>
+                                            <Button icon="pi pi-trash" severity="danger"
+                                                class="flex-initial whitespace-nowrap"
+                                                @click="deleteOrderItem($event, item)"></Button>
                                         </div>
                                     </div>
                                 </div>
@@ -55,7 +67,7 @@
                 <Button label="Batal" severity="warn" @click="visible = false" autofocus />
                 <Button label="Pesan" severity="primary" @click="SendOrder" autofocus />
             </div>
-    </template>
+        </template>
     </Dialog>
 </template>
 
@@ -88,12 +100,12 @@ const axiosStore = useAxiosStore();
 const toast = useToast();
 const visible = defineModel('visible', { type: Boolean });
 const route = useRoute();
-function getFirstOrDefaultImage(menu){
-    if(menu.images && menu.images.length > 0){
+function getFirstOrDefaultImage(menu) {
+    if (menu.images && menu.images.length > 0) {
         return generateLinkFromFileId(menu.images[0].id, menu.images[0].fullName);
     }
-    else{
-        switch(menu.menuType){
+    else {
+        switch (menu.menuType) {
             case menuTypesObj.MainCourse:
                 return mainCourseImg;
             case menuTypesObj.Drinks:
@@ -125,7 +137,7 @@ function deleteOrderItem(event, menu) {
         }
     });
 }
-function SendOrder(){
+function SendOrder() {
     const loading = axiosStore.loading.show();
     const tableId = route.params.tableId;
     const orderData = orderStore.orderList.map(o => {
@@ -136,14 +148,14 @@ function SendOrder(){
         }
     });
     axiosStore.post(`/api/order/create/${tableId}`, orderData)
-    .then((response) => {
-        toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya menghantar pesanan', life: 3000 });
-        orderStore.clearOrder();
-        visible.value = false;
-    })
-    .finally(() => {
-        loading.hide();
-    });
+        .then((response) => {
+            toast.add({ severity: 'success', summary: 'Berjaya', detail: 'Berjaya menghantar pesanan', life: 3000 });
+            orderStore.clearOrder();
+            visible.value = false;
+        })
+        .finally(() => {
+            loading.hide();
+        });
 }
 </script>
 

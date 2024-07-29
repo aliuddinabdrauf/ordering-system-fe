@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', () => {
         user.email = jwtObject.value.payload[emailClaims]
         user.roles = jwtObject.value.payload[rolesClaims]
         isAuthenticated.value = jwtObject.value.payload.exp > Date.now() / 1000
-        isAdmin.value = user.roles.includes(adminRole) || user.roles === adminRole
+        isAdmin.value = user.roles?.includes(adminRole) || user.roles === adminRole
         if (!isAuthenticated.value && authToken.value) {
           authToken.value = null
         }

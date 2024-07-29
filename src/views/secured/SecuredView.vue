@@ -1,6 +1,6 @@
 <template>
     <div class="card">
-        <Menubar :model="menuItem">
+        <Menubar :model="menuItemComputed">
             <template #item="{ item, props, hasSubmenu }">
                 <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
                     <a v-ripple :href="href" v-bind="props.action" @click="navigate">
@@ -70,32 +70,40 @@ const menuItem = reactive([
     {
         label: 'Kumpulan Menu',
         icon: 'pi pi-fw pi-bars',
+        adminOnly: true,
         route: { name: 'secured-menugroup' }
     },
     {
         label: 'Menu',
         icon: 'pi pi-fw pi-bars',
+        adminOnly: true,
         route: { name: 'secured-menu' }
     },
     {
         label: 'Meja',
         icon: 'pi pi-fw pi-bars',
+        adminOnly: true,
         route: { name: 'secured-table' }
     },
     {
         label: 'Pembayaran',
         icon: 'pi pi-fw pi-bars',
+        adminOnly: true,
         route: { name: 'secured-payment' },
         items: [
             {
                 label: 'Pembayaran',
                 icon: 'pi pi-fw pi-bars',
+                adminOnly: true,
                 route: { name: 'secured-payment' }
             }
         ]
     }
 ]);
+const menuItemComputed = computed(() => {
+    return menuItem.filter(item => !item.adminOnly || user.isAdmin);
 
+});
 const home = reactive({
     icon: 'pi pi-home',
     to: { name: 'secured-home' }

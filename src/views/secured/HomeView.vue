@@ -48,11 +48,13 @@ async function startConnection() {
 const breadcrumbStore = useBreadcrumbStore();
 breadcrumbStore.breadCrumbItem = []
 
-function onReceiveNewOrder(order) {
-    activeOrders.value.push({
-        ...order,
-        tableName: allTables.value.find(table => table.id === order.tableId).number
-    })
+function onReceiveNewOrder(orders) {
+    for (const order of orders) {
+        activeOrders.value.push({
+            ...order,
+            tableName: allTables.value.find(table => table.id === order.tableId).number
+        })
+    }
 }
 function onUpdatedOrderStatus(order, timer) {
     setTimeout(() => {
