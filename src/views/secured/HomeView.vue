@@ -50,7 +50,7 @@ breadcrumbStore.breadCrumbItem = []
 
 function onReceiveNewOrder(orders) {
     for (const order of orders) {
-        console.log(order);
+        order.menuName = allMenus.value.find(menu => menu.id === order.menuId).name;
         activeOrders.value.push({
             ...order,
             tableName: allTables.value.find(table => table.id === order.tableId).number
