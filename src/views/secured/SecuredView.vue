@@ -1,6 +1,19 @@
 <template>
     <div class="card">
         <Menubar :model="menuItem">
+            <template #item="{ item, props, hasSubmenu }">
+                <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+                    <a v-ripple :href="href" v-bind="props.action" @click="navigate">
+                        <span :class="item.icon" />
+                        <span class="ml-2">{{ item.label }}</span>
+                    </a>
+                </router-link>
+                <a v-else :href="item.url" :target="item.target" v-bind="props.action">
+                    <span :class="item.icon" />
+                    <span class="ml-2">{{ item.label }}</span>
+                    <span v-if="hasSubmenu" class="pi pi-fw pi-angle-down ml-2" />
+                </a>
+            </template>
             <template #end>
                 <div class="flex items-center gap-2">
                     <Avatar icon="pi pi-power-off" style="cursor: pointer;" @click="logout"
@@ -52,37 +65,34 @@ const menuItem = reactive([
     {
         label: 'Utama',
         icon: 'pi pi-fw pi-home',
-        command: () => {
-            router.push({ name: 'secured-home' });
-        }
+        route: { name: 'secured-home' }
     },
     {
         label: 'Kumpulan Menu',
         icon: 'pi pi-fw pi-bars',
-        command: () => {
-            router.push({ name: 'secured-menugroup' });
-        }
+        route: { name: 'secured-menugroup' }
     },
     {
         label: 'Menu',
         icon: 'pi pi-fw pi-bars',
-        command: () => {
-            router.push({ name: 'secured-menu' });
-        }
+        route: { name: 'secured-menu' }
     },
     {
         label: 'Meja',
         icon: 'pi pi-fw pi-bars',
-        command: () => {
-            router.push({ name: 'secured-table' });
-        }
+        route: { name: 'secured-table' }
     },
     {
         label: 'Pembayaran',
         icon: 'pi pi-fw pi-bars',
-        command: () => {
-            router.push({ name: 'secured-payment' });
-        }
+        route: { name: 'secured-payment' },
+        items: [
+            {
+                label: 'Pembayaran',
+                icon: 'pi pi-fw pi-bars',
+                route: { name: 'secured-payment' }
+            }
+        ]
     }
 ]);
 
